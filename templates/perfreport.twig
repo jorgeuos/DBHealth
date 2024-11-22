@@ -135,6 +135,7 @@
 
         </div>
     </div>
+    {# Error starts here #}
     <div class="card">
         <div class="card-content">
             <h3>Query Cache</h3>
@@ -171,7 +172,11 @@
 
             {% set uptime = queryCacheCheck.uptime | round(0, 'ceil') %}
 
-            {% set q_hitrate = queryCacheCheck.qcache_hits / (queryCacheCheck.qcache_hits + queryCacheCheck.qcache_inserts )*100  %}
+            {% if queryCacheCheck.qcache_hits != 0 %}
+                {% set q_hitrate = queryCacheCheck.qcache_hits / (queryCacheCheck.qcache_hits + queryCacheCheck.    qcache_inserts ) * 100  %}
+            {% else %}
+                {% set q_hitrate = 0 %}
+            {% endif %}
             {% if q_hitrate < 80 %}
             <p class="alert alert-warning">Your Query Cache hit ratio is {{q_hitrate |round(2, 'ceil')}} %, this is to low. (should be above 80%)<br>
                 However if your uptime is low this might be the reason, so make sure to wait untill your database has got enough traffic. </p>
@@ -256,6 +261,7 @@
             {% endif %}
         </div>
     </div>
+    {# end error #}
     <div class="card">
         <div class="card-content">
             <h3>Innodb Buffer pool</h3>

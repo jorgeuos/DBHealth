@@ -307,6 +307,9 @@ class Controller extends \Piwik\Plugin\Controller
             if($item['Variable_name'] == 'Qcache_total_blocks') {
                 $qcache_total_blocks = (int) $item['Value'];
             }
+            else {
+                $qcache_total_blocks = 0;
+            }
             if($item['Variable_name'] == 'Qcache_hits') {
                 $qcache_hits = (int) $item['Value'];
             }
@@ -364,8 +367,8 @@ class Controller extends \Piwik\Plugin\Controller
 
 
         }
-        $opcach_status;
-        $last_restart_time;
+        $opcach_status = null;
+        $last_restart_time = "never";
         if (!extension_loaded('Zend OPcache')) {
             $opcach_status = null;
         }
@@ -599,6 +602,24 @@ class Controller extends \Piwik\Plugin\Controller
     }
 
     /**
+     * Sanitize data
+     *
+     * @return array
+     */
+    function sanitizeData($data) {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->sanitizeData($value);
+            } elseif (is_null($value)) {
+                $data[$key] = "N/A";
+            } elseif (is_string($value) && trim($value) === "") {
+                $data[$key] = "No data available";
+            }
+        }
+        return $data;
+    }
+
+    /**
      * Run DB tests and Visualize
      *
      * @return object
@@ -610,8 +631,8 @@ class Controller extends \Piwik\Plugin\Controller
         //opcache_invalidate('/opt/lampp/htdocs/matomo/plugins/DBHealth/Controller.php');
         return $this->renderTemplate(
             'perfreport',
-            [
-             'db_connection' =>  $this->dbStatus(),
+            $this->sanitizeData([
+             'db_connection' => $this->dbStatus(),
              'tmpTableCheck' => $this->tmpTableCheck(),
              'queryCacheCheck' => $this->queryCacheCheck(),
              'getBufferpoolTest' => $this->getBufferpoolTest(),
@@ -621,7 +642,7 @@ class Controller extends \Piwik\Plugin\Controller
              'getPhpRealpathCacheUsage' => $this->getPhpRealpathCacheUsage(),
              'getPhpRealpathCacheSettings' => $this->getPhpRealpathCacheSettings(),
              'phpInfo' => $this->getPhpMemInfo()
-            ]
+            ])
         );
 
     }
@@ -680,16 +701,19 @@ class Controller extends \Piwik\Plugin\Controller
      * @return int
      */
      function dbStatus() {
+        try {
+            $time_start = hrtime(true);
+            // We use SELECT 1; as the test query as we only want to check for latency between the host and the mysql engine, we are not testing the database schema performance here.
+            $db = new Db();
+            $query = "SELECT 1";
+            $result = $db::fetchAll($query);
 
-        $time_start = hrtime(true);
-        // We use SELECT 1; as the test query as we only want to check for latency between the host and the mysql engine, we are not testing the database schema performance here.
-        $db = new Db();
-        $query = "SELECT 1";
-        $result = $db::fetchAll($query);
-
-        $time_end = hrtime(true);
-        $time = $time_end  - $time_start;
-        return  $time/1e+6;
+            $time_end = hrtime(true);
+            $time = $time_end  - $time_start;
+            return  $time/1e+6;
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
       /**

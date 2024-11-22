@@ -1,5 +1,8 @@
 # Matomo DBHealth Plugin
 
+This is a fork of the original plugin by [Digitalist](https://github.com/digitalist-se/DBHealth) with some additional fixes.
+
+
 ## Description
 
 This plugin simply gives you a sub menu in the admin section called 
