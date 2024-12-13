@@ -1,5 +1,6 @@
 {
     "DBHealth": {
-        "Mysqlstatus": "Mysql status"
+        "Mysqlstatus": "Mysql status",
+        "PerformanceTuning": "Performance Tuning"
     }
 }

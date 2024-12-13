@@ -24,11 +24,11 @@ class Menu extends \Piwik\Plugin\Menu
     public function configureAdminMenu(MenuAdmin $menu)
     {
     if (Piwik::hasUserSuperUserAccess()) {
-        $menu->addItem('Performance tuning', "Run performance tips", $this->urlForAction('getPerfChecks'));
-        $menu->addItem('Performance tuning', "DB Status variables", $this->urlForAction('getMysqlStatus'));
-        $menu->addItem('Performance tuning', "DB Setting variables", $this->urlForAction('getMysqlVariableData'));
-        $menu->addItem('Performance tuning', "Show database table status", $this->urlForAction('getMysqlTableStatus'));
-        $menu->addItem('Performance tuning', "Show problematic segments", $this->urlForAction('showProblematicSegments'));
+        $menu->addItem('DBHealth_PerformanceTuning', "Run performance tips", $this->urlForAction('getPerfChecks'));
+        $menu->addItem('DBHealth_PerformanceTuning', "DB Status variables", $this->urlForAction('getMysqlStatus'));
+        $menu->addItem('DBHealth_PerformanceTuning', "DB Setting variables", $this->urlForAction('getMysqlVariableData'));
+        $menu->addItem('DBHealth_PerformanceTuning', "Show database table status", $this->urlForAction('getMysqlTableStatus'));
+        $menu->addItem('DBHealth_PerformanceTuning', "Show problematic segments", $this->urlForAction('showProblematicSegments'));
     }
 
     }
